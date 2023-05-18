@@ -1,0 +1,21 @@
+set -o errexit
+set -o pipefail
+set -o nounset
+
+if [ -z "$1" ]; then
+    echo "you should input an ssh addr"
+    exit 0
+fi
+repo_home=~/go/src
+# git@github.com:geoquant/R.git
+addr=$1
+echo "$addr"
+domain=$(echo "$addr" | awk '{t=$0;gsub(/.*@|:.*/,"",t);print t}')
+group=$(echo "$addr" | awk '{t=$0;gsub(/.*:|\/.*/,"",t);print t}')
+project=$(echo "$addr" | awk '{t=$0;gsub(/.*\/|\.git$/,"",t);print t}')
+
+group_path="$repo_home/$domain/$group"
+project_path="$repo_home/$domain/$group/$project"
+echo "$project_path"
+mkdir -p "$group_path"
+zsh -c "cd $group_path;git clone $addr;cd $project_path;git pull -p;"
